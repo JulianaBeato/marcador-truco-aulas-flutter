@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:marcador_truco/models/player.dart';
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -7,8 +9,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var _playerOne = Player(name: "Nós", score: 0, victories: 0);
+  var _playerOne = Player(name: "Nos", score: 0, victories: 0);
   var _playerTwo = Player(name: "Eles", score: 0, victories: 0);
+  TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -24,15 +27,17 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _resetPlayers({bool resetVictories = true}) {
+  void _resetPlayers({bool resetVictories = false}) {
     _resetPlayer(player: _playerOne, resetVictories: resetVictories);
     _resetPlayer(player: _playerTwo, resetVictories: resetVictories);
   }
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+
         backgroundColor: Colors.deepOrange,
         title: Text("Marcador Pontos (Truco!)"),
         actions: <Widget>[
@@ -138,7 +143,12 @@ class _HomePageState extends State<HomePage> {
           color: Colors.black.withOpacity(0.1),
           onTap: () {
             setState(() {
-              player.score--;
+              if(player.score >= 1) player.score--;
+              else{
+                _showDialog( 
+                  title: 'Pontuação zerada',
+                  message:
+                      'Potuação zerada!! Não é possivel diminuir mais.',);}
             });
           },
         ),
@@ -149,7 +159,18 @@ class _HomePageState extends State<HomePage> {
             setState(() {
               player.score++;
             });
-
+            if((_playerOne.score == 11) && (_playerTwo.score == 11)){
+               _showDialog(
+                  title: 'Mão de ferro',
+                  message: 'Jogar com as cartas viradas',
+                  confirm: () {
+                    setState(() {
+                    
+                    });
+                    
+                  }
+               );
+              }
             if (player.score == 12) {
               _showDialog(
                   title: 'Fim do jogo',
@@ -176,11 +197,44 @@ class _HomePageState extends State<HomePage> {
   void _showDialog(
       {String title, String message, Function confirm, Function cancel}) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(title),
           content: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("CANCEL"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (cancel != null) cancel();
+              },
+            ),
+            FlatButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (confirm != null) confirm();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+     void _showDialogName(
+      {String title, String message, Function confirm, Function cancel}) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: TextField(
+            controller: _controller,
+            decoration: InputDecoration(hintText: "TextField in Dialog")
+          ),
           actions: <Widget>[
             FlatButton(
               child: Text("CANCEL"),
