@@ -223,6 +223,7 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+  
      void _showDialogName(
       {String title, String message, Function confirm, Function cancel}) {
     showDialog(
